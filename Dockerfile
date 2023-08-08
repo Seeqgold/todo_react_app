@@ -1,8 +1,11 @@
-# syntax=docker/dockerfile:1
-   
-FROM node:18-alpine
+FROM denoland/deno:latest as base
+
 WORKDIR /app
-COPY . .
-CMD ["node", "src/index.js"]
+
+COPY . ./
+
 EXPOSE 80
-LABEL version="1.1"
+
+RUN deno cache server.ts
+
+CMD ["run", "--allow-net", "server.ts"]

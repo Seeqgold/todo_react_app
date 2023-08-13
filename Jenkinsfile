@@ -1,35 +1,44 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_HUB_CREDENTIALS = 'Docker_credentials'
+        IMAGE_NAME = 'myapp'
+        IMAGE_TAG = 'latest'
+    }
+
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                script{
-                    docker.withRegistry('https://registry.example.com',
-                    'docker-credentials-id'){
-                        def customImage=
-                        docker.build("my-custom-image:${env.BUILD_NUMBER}")
-                    }
+                script {
+                    def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}", '.')
                 }
             }
         }
-        stage('Run Docker Container'){
-            steps{
-                scripts{
-        docker.image('my-custom-image:${env.BUILD_NUMBER}').withRun('-p 8080:80'))
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    def containerId = docker.image("${IMAGE_NAME}:${IMAGE_TAG}").run("-p 8080:80 -d")
                 }
             }
         }
-         stage('push Docker Container'){
-            steps{
-                scripts{
-        docker.push('my-custom-image:${env.BUILD_NUMBER}').withRun('-p 8080:80'))
-                }
-        }
-}
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
                     }
                 }
             }
         }
     }
 }
+toso

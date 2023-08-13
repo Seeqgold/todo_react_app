@@ -25,7 +25,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    def containerId = docker.image("${IMAGE_NAME}:${IMAGE_TAG}").run("-p 8080:80 -d")
+                    def containerId = docker.image("${IMAGE_NAME}:${IMAGE_TAG}").run("-p 3000:3000 -d")
                 }
             }
         }
@@ -41,4 +41,3 @@ pipeline {
         }
     }
 }
-toso
